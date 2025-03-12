@@ -1,0 +1,6 @@
+
+# Ignorowanie plików Visual Studio
+.vs/
+
+# Ignorowanie konkretnego pliku powodującego błąd
+RENT_A_TOOL/.vs/RENT_A_TOOL/FileContentIndex/171f94cf-f0ab-4162-aa9c-0378f3205ce8.vsidx
