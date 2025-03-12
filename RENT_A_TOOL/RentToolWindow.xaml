@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:RENT_A_TOOL"
         mc:Ignorable="d"
-        Title="RentToolWindow" Height="450" Width="400">
+        Title="RentToolWindow" Height="350" Width="300">
     <Grid>
         <TextBlock x:Name="ToolNameText" FontWeight="Bold" FontSize="16" Margin="10,10,10,0"/>
 

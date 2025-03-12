@@ -20,13 +20,15 @@ namespace RENT_A_TOOL
         private int _userId;
         private int _toolId;
         private string _toolName;
+        private ToolsWindow _toolsWindow;
 
-        public RentToolWindow(int userId, int toolId, string toolName)
+        public RentToolWindow(int userId, int toolId, string toolName, ToolsWindow toolsWindow)
         {
             InitializeComponent();
             _userId = userId;
             _toolId = toolId;
             _toolName = toolName;
+            _toolsWindow = toolsWindow;
             ToolNameText.Text = $"Wypożyczenie: {_toolName}";
         }
 
@@ -59,10 +61,27 @@ namespace RENT_A_TOOL
                         return;
                     }
 
+                    var tool = context.Sprzęt.FirstOrDefault(t => t.Id == _toolId);
+                    if (tool == null)
+                    {
+                        MessageBox.Show("Nie znaleziono sprzętu z podanym ID.");
+                        return;
+                    }
+
+                    if (tool.StanMagazynowy <= 0)
+                    {
+                        MessageBox.Show("Niestety, sprzęt jest niedostępny.");
+                        return;
+                    }
+
+
+
                     context.Wypożyczenia.Add(wypożyczenie);
+                    tool.StanMagazynowy--;
                     context.SaveChanges();
 
                     MessageBox.Show("Narzędzie zostało wypożyczone pomyślnie!");
+                    _toolsWindow.RefreshSprzetList();
                     this.Close();
                 }
             }

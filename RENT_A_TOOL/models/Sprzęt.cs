@@ -11,7 +11,7 @@ namespace RENT_A_TOOL.models
         public int Id { get; set; }
         public string Nazwa { get; set; }
         public string Opis { get; set; }
-        public string StanMagazynowy { get; set; }
+        public int StanMagazynowy { get; set; }
         public byte[]? Zdjecie { get; set; }
 
     }

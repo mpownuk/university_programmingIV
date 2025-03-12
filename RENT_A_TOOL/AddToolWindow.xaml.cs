@@ -78,7 +78,7 @@ namespace RENT_A_TOOL
                 {
                     Nazwa = nazwa,
                     Opis = opis,
-                    StanMagazynowy = stanMagazynowy,
+                    StanMagazynowy = int.Parse(stanMagazynowy),
                     Zdjecie = _imageData
                 };
 
@@ -87,6 +87,7 @@ namespace RENT_A_TOOL
             }
 
             MessageBox.Show("Sprzęt został dodany pomyślnie!", "Sukces", MessageBoxButton.OK, MessageBoxImage.Information);
+
             _parentWindow.RefreshSprzetList();
             this.Close();
         }
