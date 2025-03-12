@@ -18,9 +18,11 @@ namespace RENT_A_TOOL
 {
     public partial class LoginWindow : Window
     {
-        public LoginWindow()
+        private MainWindow _mainWindow;
+        public LoginWindow(MainWindow mainWindow)
         {
             InitializeComponent();
+            _mainWindow = mainWindow;
         }
 
         private void LoginButton_Click(object sender, RoutedEventArgs e)
@@ -34,9 +36,11 @@ namespace RENT_A_TOOL
                 return;
             }
 
+            Użytkownik uzytkownik;
+
             using (var context = new Rent_a_toolContext())
             {
-                var uzytkownik = context.Użytkownicy.FirstOrDefault(u => u.Email == email);
+                uzytkownik = context.Użytkownicy.FirstOrDefault(u => u.Email == email);
 
                 if (uzytkownik == null || !VerifyHaslo(haslo, uzytkownik.HasloHash))
                 {
@@ -45,11 +49,16 @@ namespace RENT_A_TOOL
                 }
             }
 
+            int userId = uzytkownik.Id;
+            string userName = uzytkownik.Imie;
+
             MessageBox.Show("Logowanie udane!", "Sukces", MessageBoxButton.OK, MessageBoxImage.Information);
-            ToolsWindow toolsWindow = new ToolsWindow();
+            _mainWindow.Close();
+            ToolsWindow toolsWindow = new ToolsWindow(userName, userId);
             toolsWindow.Show();
 
             this.Close();
+
         }
 
 

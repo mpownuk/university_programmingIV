@@ -12,6 +12,8 @@ namespace RENT_A_TOOL.models
         public DbSet<Użytkownik> Użytkownicy { get; set; }
         public DbSet<Sprzęt> Sprzęt { get; set; }
         public DbSet<Wypożyczenie> Wypożyczenia { get; set; }
+        //public object Wypożyczenie { get; internal set; }
+
         protected override void OnConfiguring(DbContextOptionsBuilder options)
         {
             options.UseSqlServer("Server=DESKTOP-2R2BO2O\\SQLEXPRESS;Database=rent-a-tool;Trusted_Connection=True;TrustServerCertificate=True;");

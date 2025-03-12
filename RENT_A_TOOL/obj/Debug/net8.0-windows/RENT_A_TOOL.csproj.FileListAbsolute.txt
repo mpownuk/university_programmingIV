@@ -150,3 +150,8 @@ C:\Users\Laptop\Desktop\STUDIA\SEMESTR 4\PROGRAMOWANIE IV\RENT_A_TOOL\RENT_A_TOO
 C:\Users\Laptop\Desktop\STUDIA\SEMESTR 4\PROGRAMOWANIE IV\RENT_A_TOOL\RENT_A_TOOL\obj\Debug\net8.0-windows\RegisterWindow.baml
 C:\Users\Laptop\Desktop\STUDIA\SEMESTR 4\PROGRAMOWANIE IV\RENT_A_TOOL\RENT_A_TOOL\obj\Debug\net8.0-windows\ToolsWindow.g.cs
 C:\Users\Laptop\Desktop\STUDIA\SEMESTR 4\PROGRAMOWANIE IV\RENT_A_TOOL\RENT_A_TOOL\obj\Debug\net8.0-windows\ToolsWindow.baml
+C:\Users\Laptop\Desktop\STUDIA\SEMESTR 4\PROGRAMOWANIE IV\RENT_A_TOOL\RENT_A_TOOL\obj\Debug\net8.0-windows\RENT_A_TOOL.sourcelink.json
+C:\Users\Laptop\Desktop\STUDIA\SEMESTR 4\PROGRAMOWANIE IV\RENT_A_TOOL\RENT_A_TOOL\obj\Debug\net8.0-windows\AddToolWindow.g.cs
+C:\Users\Laptop\Desktop\STUDIA\SEMESTR 4\PROGRAMOWANIE IV\RENT_A_TOOL\RENT_A_TOOL\obj\Debug\net8.0-windows\AddToolWindow.baml
+C:\Users\Laptop\Desktop\STUDIA\SEMESTR 4\PROGRAMOWANIE IV\RENT_A_TOOL\RENT_A_TOOL\obj\Debug\net8.0-windows\RentToolWindow.g.cs
+C:\Users\Laptop\Desktop\STUDIA\SEMESTR 4\PROGRAMOWANIE IV\RENT_A_TOOL\RENT_A_TOOL\obj\Debug\net8.0-windows\RentToolWindow.baml

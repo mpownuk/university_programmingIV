@@ -22,7 +22,7 @@ namespace RENT_A_TOOL
         }
    private void Login_Click(object sender, RoutedEventArgs e)
 {
-    LoginWindow loginWindow = new LoginWindow();
+    LoginWindow loginWindow = new LoginWindow(this);
     loginWindow.Show();
 }
 

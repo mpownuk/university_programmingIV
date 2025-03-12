@@ -21,12 +21,35 @@ namespace RENT_A_TOOL
     /// </summary>
     public partial class ToolsWindow : Window
     {
-        public ToolsWindow()
+        private string _userName;
+        private int _userId;
+
+        public ToolsWindow(string userName, int userId)
         {
             InitializeComponent();
+            _userName = userName;
+            _userId = userId;
             LoadSprzet();
+            DisplayUserName();
+            CheckAdminPrivileges();
+
         }
 
+        private void DisplayUserName()
+        {
+            TextBlock userNameBlock = new TextBlock
+            {
+                Text = $"Witaj, {_userName}!",
+                FontWeight = FontWeights.Bold,
+                FontSize = 16,
+                Margin = new Thickness(10),
+                HorizontalAlignment = HorizontalAlignment.Right
+            };
+
+            MainGrid.Children.Add(userNameBlock);
+            Grid.SetRow(userNameBlock, 0);
+            Grid.SetColumn(userNameBlock, 1);
+        }
 
         private void LoadSprzet()
         {
@@ -81,7 +104,11 @@ namespace RENT_A_TOOL
                 Background = Brushes.LightGray,
                 Margin = new Thickness(5)
             };
-            button.Click += (s, e) => MessageBox.Show($"Wybrano: {sprzet.Nazwa}");
+            button.Click += (s, e) =>
+            {
+                RentToolWindow rentWindow = new RentToolWindow(_userId, sprzet.Id, sprzet.Nazwa);
+                rentWindow.ShowDialog();
+            };
 
             return button;
         }
@@ -105,5 +132,40 @@ namespace RENT_A_TOOL
             return placeholder;
         }
 
+        private void CheckAdminPrivileges()
+        {
+            if (_userName.ToUpper() == "ADMIN")
+            {
+                Button addButton = new Button
+                {
+                    Content = "Dodaj sprzęt",
+                    FontSize = 14,
+                    Width = 150,
+                    Padding = new Thickness(10),
+                    Margin = new Thickness(10),
+                    HorizontalAlignment = HorizontalAlignment.Center,
+                    VerticalAlignment = VerticalAlignment.Bottom,
+                    Background = Brushes.Green,
+                    Foreground = Brushes.White
+                };
+
+                addButton.Click += AddButton_Click;
+                MainGrid.Children.Add(addButton);
+                Grid.SetRow(addButton, 2);
+                Grid.SetColumnSpan(addButton, 2);
+            }
+        }
+
+        private void AddButton_Click(object sender, RoutedEventArgs e)
+        {
+            AddToolWindow addToolWindow = new AddToolWindow(this);
+            addToolWindow.ShowDialog();
+        }
+
+        public void RefreshSprzetList()
+        {
+            SprzetPanel.Children.Clear();
+            LoadSprzet();
+        }
     }
 }
