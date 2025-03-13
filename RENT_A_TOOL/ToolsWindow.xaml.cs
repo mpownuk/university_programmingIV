@@ -106,7 +106,7 @@ namespace RENT_A_TOOL
             };
             button.Click += (s, e) =>
             {
-                RentToolWindow rentWindow = new RentToolWindow(_userId, sprzet.Id, sprzet.Nazwa, this);
+                RentToolWindow rentWindow = new RentToolWindow(_userId, sprzet.Id, sprzet.Nazwa, _userName, this);
                 rentWindow.ShowDialog();
             };
 

@@ -1,20 +1,33 @@
 ﻿<Window x:Class="RENT_A_TOOL.RentToolWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:RENT_A_TOOL"
-        mc:Ignorable="d"
-        Title="RentToolWindow" Height="350" Width="300">
-    <Grid>
-        <TextBlock x:Name="ToolNameText" FontWeight="Bold" FontSize="16" Margin="10,10,10,0"/>
+        Title="Wypożycz narzędzie" Height="400" Width="400" ResizeMode="NoResize">
 
-        <TextBlock Text="Wybierz datę wypożyczenia:" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="10,60,10,0"/>
-        <DatePicker x:Name="RentDatePicker" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="150,60,10,0"/>
+    <Grid x:Name="RentGrid" Margin="10">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
 
-        <TextBlock Text="Wybierz datę zwrotu:" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="10,100,10,0"/>
-        <DatePicker x:Name="ReturnDatePicker" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="150,100,10,0"/>
+        <TextBlock x:Name="ToolNameText" FontWeight="Bold" FontSize="18" 
+                   HorizontalAlignment="Center" Margin="0,10,0,20"/>
 
-        <Button Content="Potwierdź wypożyczenie" Width="150" Height="40" HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="0,0,0,20" Click="ConfirmRent_Click"/>
+        <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="10">
+            <TextBlock Text="Wybierz datę wypożyczenia:" VerticalAlignment="Center" Width="180"/>
+            <DatePicker x:Name="RentDatePicker"/>
+        </StackPanel>
+
+        <StackPanel Grid.Row="2" Orientation="Horizontal" Margin="10">
+            <TextBlock Text="Wybierz datę zwrotu:" VerticalAlignment="Center" Width="180"/>
+            <DatePicker x:Name="ReturnDatePicker"/>
+        </StackPanel>
+
+        <Button Content="Potwierdź wypożyczenie" Width="200" Height="40" 
+                HorizontalAlignment="Center" Grid.Row="4" Margin="10"
+                Click="ConfirmRent_Click"/>
     </Grid>
 </Window>

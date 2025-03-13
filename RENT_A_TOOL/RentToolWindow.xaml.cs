@@ -21,15 +21,68 @@ namespace RENT_A_TOOL
         private int _toolId;
         private string _toolName;
         private ToolsWindow _toolsWindow;
+        private string _userName;
 
-        public RentToolWindow(int userId, int toolId, string toolName, ToolsWindow toolsWindow)
+        public RentToolWindow(int userId, int toolId, string toolName, string userName, ToolsWindow toolsWindow)
         {
             InitializeComponent();
             _userId = userId;
             _toolId = toolId;
             _toolName = toolName;
             _toolsWindow = toolsWindow;
+            _userName = userName;
+            CheckAdminPrivileges();
             ToolNameText.Text = $"Wypożyczenie: {_toolName}";
+        }
+        private void CheckAdminPrivileges()
+        {
+            if (_userName.ToUpper() == "ADMIN")
+            {
+                Button deleteButton = new Button
+                {
+                    Content = "Usuń sprzęt",
+                    FontSize = 14,
+                    Width = 150,
+                    Padding = new Thickness(10),
+                    Margin = new Thickness(10),
+                    HorizontalAlignment = HorizontalAlignment.Center,
+                    VerticalAlignment = VerticalAlignment.Bottom,
+                    Background = Brushes.Red,
+                    Foreground = Brushes.White
+                };
+
+                RentGrid.Children.Add(deleteButton);
+                Grid.SetRow(deleteButton, 6);
+                deleteButton.Click += DeleteTool_Click;
+            }
+        }
+        private void DeleteTool_Click(object sender, RoutedEventArgs e)
+        {
+            MessageBoxResult result = MessageBox.Show($"Czy na pewno chcesz usunąć narzędzie: {_toolName}?",
+                                                      "Potwierdzenie usunięcia",
+                                                      MessageBoxButton.YesNo,
+                                                      MessageBoxImage.Warning);
+
+            if (result == MessageBoxResult.Yes)
+            {
+                using (var context = new Rent_a_toolContext())
+                {
+                    var tool = context.Sprzęt.FirstOrDefault(t => t.Id == _toolId);
+                    if (tool == null)
+                    {
+                        MessageBox.Show("Nie znaleziono sprzętu do usunięcia.", "Błąd", MessageBoxButton.OK, MessageBoxImage.Error);
+                        return;
+                    }
+
+                    context.Sprzęt.Remove(tool);
+                    context.SaveChanges();
+
+                    MessageBox.Show("Sprzęt został pomyślnie usunięty!", "Sukces", MessageBoxButton.OK, MessageBoxImage.Information);
+
+                    _toolsWindow.RefreshSprzetList();
+                    this.Close();
+                }
+            }
         }
 
         private void ConfirmRent_Click(object sender, RoutedEventArgs e)
