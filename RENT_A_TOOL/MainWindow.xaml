@@ -8,18 +8,26 @@
         Title="MainWindow" Height="450" Width="800">
     <Grid>
         <Grid.Background>
-            <ImageBrush ImageSource="C:\Users\Laptop\Desktop\STUDIA\SEMESTR 4\PROGRAMOWANIE IV\RENT_A_TOOL\rent_a_tool_images" Stretch="Fill"/>
+            <ImageBrush ImageSource="C:\Users\Laptop\Desktop\STUDIA\SEMESTR 4\PROGRAMOWANIE IV\RENT_A_TOOL\RENT_A_TOOL\Pictures\header-photo4.jpg" />
         </Grid.Background>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="*"/>
-            <RowDefinition Height="Auto"/>
-        </Grid.RowDefinitions>
-        <Label Grid.Row="0" Content="Witamy w Rent-a-Tool!" HorizontalAlignment="Center" VerticalAlignment="Top"/>
-        <Button Grid.Row="1" Content="Zaloguj się" HorizontalAlignment="Left" VerticalAlignment="Center" Width="100" Click="Login_Click" Margin="111,0,0,0"/>
-        <Button Grid.Row="1" Content="Zarejestruj się" HorizontalAlignment="Left" VerticalAlignment="Center" Width="100" Click="Register_Click" Margin="589,0,0,0"/>
+
+        <Label Content="Witamy w Rent-a-Tool!" 
+               FontSize="40" FontStyle="Oblique" 
+               Foreground="Blue" FontWeight="Bold"
+               HorizontalAlignment="Center" VerticalAlignment="Top"
+                Padding="10,5" RenderTransformOrigin="0.503,1.315" Margin="0,29,0,0"/>
+        <Button Content="Zaloguj się" 
+                HorizontalAlignment="Left" VerticalAlignment="Top" 
+                FontSize="20" Padding="50,20" Click="Login_Click" 
+                Margin="108,234,0,0"
+                Background="Blue" Foreground="White"
+                BorderBrush="White" BorderThickness="0"/>
+
+        <Button Content="Zarejestruj się" 
+                HorizontalAlignment="Left" VerticalAlignment="Top" 
+                FontSize="20" Padding="50,20" Click="Register_Click" 
+                Margin="465,234,0,0"
+                Background="Green" Foreground="White"
+                BorderBrush="White" BorderThickness="0"/>
     </Grid>
 </Window>
