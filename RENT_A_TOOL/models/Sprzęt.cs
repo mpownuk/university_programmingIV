@@ -6,6 +6,8 @@ using System.Threading.Tasks;
 
 namespace RENT_A_TOOL.models
 {
+
+    //reprezencjacja tabeli
     internal class Sprzęt
     {
         public int Id { get; set; }

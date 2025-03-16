@@ -38,23 +38,47 @@ namespace RENT_A_TOOL
         {
             if (_userName.ToUpper() == "ADMIN")
             {
+                Button updateButton = new Button
+                {
+                    Content ="Edytuj sprzęt",
+                    FontSize = 14,
+                    Width = 100,
+                    Padding = new Thickness(10),
+                    Margin  =new Thickness(10),
+                    HorizontalAlignment = HorizontalAlignment.Left,
+                    VerticalAlignment = VerticalAlignment.Bottom,
+                    Background  =Brushes.Blue,
+                    Foreground = Brushes.White
+                };
+
                 Button deleteButton = new Button
                 {
                     Content = "Usuń sprzęt",
                     FontSize = 14,
-                    Width = 150,
+                    Width = 100,
                     Padding = new Thickness(10),
                     Margin = new Thickness(10),
-                    HorizontalAlignment = HorizontalAlignment.Center,
+                    HorizontalAlignment = HorizontalAlignment.Right,
                     VerticalAlignment = VerticalAlignment.Bottom,
                     Background = Brushes.Red,
                     Foreground = Brushes.White
                 };
+                RentGrid.Children.Add(updateButton);
+                Grid.SetRow(updateButton, 5);
+                updateButton.Click += UpdateTool_Click;
 
                 RentGrid.Children.Add(deleteButton);
-                Grid.SetRow(deleteButton, 6);
+                Grid.SetRow(deleteButton, 5);
                 deleteButton.Click += DeleteTool_Click;
             }
+        }
+
+        private void UpdateTool_Click(object sender, RoutedEventArgs e)
+        {
+            UpdateToolWindow updateToolWindow = new UpdateToolWindow(_toolId, _toolsWindow);
+            updateToolWindow.Show();
+            this.Close();
+
         }
         private void DeleteTool_Click(object sender, RoutedEventArgs e)
         {

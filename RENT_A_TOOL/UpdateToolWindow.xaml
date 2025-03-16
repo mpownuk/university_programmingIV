@@ -1,0 +1,36 @@
+﻿<Window x:Class="RENT_A_TOOL.UpdateToolWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:RENT_A_TOOL"
+        mc:Ignorable="d"
+        Title="UpdateToolWindow" Height="450" Width="400" ResizeMode="NoResize">
+
+    <Grid Margin="10">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <TextBlock Text="Nazwa:"/>
+        <TextBox x:Name="NazwaTextBox" Grid.Row="0" Margin="0,5,0,10"/>
+
+        <TextBlock Text="Opis:" Grid.Row="1"/>
+        <TextBox x:Name="OpisTextBox" Grid.Row="2" Height="50" TextWrapping="Wrap" AcceptsReturn="True" Margin="0,5,0,10"/>
+
+        <TextBlock Text="Stan magazynowy:" Grid.Row="3"/>
+        <TextBox x:Name="StanMagazynowyTextBox" Grid.Row="4" Margin="0,5,0,10"/>
+
+        <Button x:Name="WybierzZdjecieButton" Content="Wybierz zdjęcie" Grid.Row="5" Click="WybierzZdjecieButton_Click" Margin="0,5"/>
+        <Image x:Name="PreviewImage" Grid.Row="6" Height="100" Width="100" Margin="10" Visibility="Collapsed"/>
+
+        <Button x:Name="EdytujButton" Content="Edytuj sprzęt" Grid.Row="7" Click="EdytujButton_Click" Margin="0,10,0,0"/>
+    </Grid>
+</Window>

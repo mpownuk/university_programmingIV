@@ -11,22 +11,22 @@
             <ImageBrush ImageSource="C:\Users\Laptop\Desktop\STUDIA\SEMESTR 4\PROGRAMOWANIE IV\RENT_A_TOOL\RENT_A_TOOL\Pictures\header-photo4.jpg" />
         </Grid.Background>
 
-        <Label Content="Witamy w Rent-a-Tool!" 
-               FontSize="40" FontStyle="Oblique" 
+        <Label Content="Rent-a-Tool" 
+               FontSize="70" FontStyle="Normal"  FontFamily="Agency FB"
                Foreground="Blue" FontWeight="Bold"
                HorizontalAlignment="Center" VerticalAlignment="Top"
-                Padding="10,5" RenderTransformOrigin="0.503,1.315" Margin="0,29,0,0"/>
-        <Button Content="Zaloguj się" 
+                Padding="10,5" RenderTransformOrigin="0.503,1.315" Margin="0,95,0,0"/>
+        <Button Content="Zaloguj się" FontFamily="Agency FB"
                 HorizontalAlignment="Left" VerticalAlignment="Top" 
-                FontSize="20" Padding="50,20" Click="Login_Click" 
-                Margin="108,234,0,0"
+                FontSize="30" Padding="50,20" Click="Login_Click" 
+                Margin="106,267,0,0"
                 Background="Blue" Foreground="White"
-                BorderBrush="White" BorderThickness="0"/>
+                BorderBrush="White" BorderThickness="0" RenderTransformOrigin="0.527,1.166"/>
 
-        <Button Content="Zarejestruj się" 
+        <Button Content="Zarejestruj się" FontFamily="Agency FB"
                 HorizontalAlignment="Left" VerticalAlignment="Top" 
-                FontSize="20" Padding="50,20" Click="Register_Click" 
-                Margin="465,234,0,0"
+                FontSize="30" Padding="50,20" Click="Register_Click" 
+                Margin="461,267,0,0"
                 Background="Green" Foreground="White"
                 BorderBrush="White" BorderThickness="0"/>
     </Grid>
