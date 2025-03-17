@@ -11,12 +11,14 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
-using RENT_A_TOOL.models;
+using Microsoft.Data.SqlClient;
 
 namespace RENT_A_TOOL
 {
     public partial class RegisterWindow : Window
     {
+        private string connectionString = "Server=DESKTOP-2R2BO2O\\SQLEXPRESS;Database=rent-a-tool;Trusted_Connection=True;TrustServerCertificate=True;";
+
         public RegisterWindow()
         {
             InitializeComponent();
@@ -35,24 +37,45 @@ namespace RENT_A_TOOL
                 MessageBox.Show("Wszystkie pola są wymagane!", "Błąd", MessageBoxButton.OK, MessageBoxImage.Error);
                 return;
             }
-
-            Użytkownik nowyUzytkownik = new Użytkownik
+            if (ZarejestrujUzytkownika(imie, nazwisko, email, haslo))
             {
-                Imie = imie,
-                Nazwisko = nazwisko,
-                Email = email,
-                HasloHash = haslo
-            };
-
-            using (var context = new Rent_a_toolContext())
-            {
-                context.Użytkownicy.Add(nowyUzytkownik);
-                context.SaveChanges();
+                MessageBox.Show("Rejestracja zakończona sukcesem!","Sukces",MessageBoxButton.OK, MessageBoxImage.Information);
+                this.Close();
             }
+            else
+            {
+                MessageBox.Show("Wsytąpił błąd podczas rejestracji użytkownika!", "Błąd", MessageBoxButton.OK, MessageBoxImage.Error);
 
-            MessageBox.Show("Rejestracja zakończona sukcesem!", "Sukces", MessageBoxButton.OK, MessageBoxImage.Information);
-            this.Close();
+            }
         }
 
+        private bool ZarejestrujUzytkownika(string imie, string nazwisko, string email, string haslo)
+        {
+            string query = "INSERT INTO Użytkownicy (imie, nazwisko, email, haslohash) VALUES (@imie, @nazwisko, @email, @haslo)";
+
+            using (SqlConnection conn = new SqlConnection(connectionString))
+            {
+                try
+                {
+                    conn.Open();
+                    using (SqlCommand cmd = new SqlCommand(query, conn))
+                    {
+                        cmd.Parameters.AddWithValue("@imie", imie);
+                        cmd.Parameters.AddWithValue("@Nazwisko", nazwisko);
+                        cmd.Parameters.AddWithValue("@Email", email);
+                        cmd.Parameters.AddWithValue("@Haslo", haslo);
+                        
+                        int result = cmd.ExecuteNonQuery();
+                        return result > 0;
+                    }
+
+                } catch ( Exception ex)
+                {
+
+                    MessageBox.Show("Błąd:", ex.Message);
+                    return false;
+                }
+            }
+        }
     }
 }
