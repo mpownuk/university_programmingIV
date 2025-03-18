@@ -1,67 +1,55 @@
-﻿
-using System;
-using System.Collections.Generic;
+﻿using System;
+using Microsoft.Data.SqlClient;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
 using Microsoft.Win32;
-using RENT_A_TOOL.models;
 
 namespace RENT_A_TOOL
 {
-    /// <summary>
-    /// Logika interakcji dla klasy AddToolWindow.xaml
-    /// </summary>
     public partial class AddToolWindow : Window
     {
         private byte[]? _imageData;
-
         private ToolsWindow _parentWindow;
+        private string _connectionString;
 
-        public AddToolWindow(ToolsWindow parentWindow)
+        public AddToolWindow(ToolsWindow parentWindow, string connectionString)
         {
             InitializeComponent();
             _parentWindow = parentWindow;
+            _connectionString = connectionString;
         }
+
         private void WybierzZdjecieButton_Click(object sender, RoutedEventArgs e)
         {
-        OpenFileDialog openFileDialog = new OpenFileDialog
-        {
-            Title = "Wybierz zdjęcie",
-            Filter = "Obrazy (*.jpg;*.png;*.jpeg)|*.jpg;*.png;*.jpeg"
-        };
+            OpenFileDialog openFileDialog = new OpenFileDialog
+            {
+                Title = "Wybierz zdjęcie",
+                Filter = "Obrazy (*.jpg;*.png;*.jpeg)|*.jpg;*.png;*.jpeg"
+            };
 
-        if (openFileDialog.ShowDialog() == true)
-        {
-            _imageData = File.ReadAllBytes(openFileDialog.FileName);
+            if (openFileDialog.ShowDialog() == true)
+            {
+                _imageData = File.ReadAllBytes(openFileDialog.FileName);
 
-            BitmapImage bitmap = new BitmapImage();
-            bitmap.BeginInit();
-            bitmap.CacheOption = BitmapCacheOption.OnLoad;
-            bitmap.UriSource = new Uri(openFileDialog.FileName);
-            bitmap.EndInit();
+                BitmapImage bitmap = new BitmapImage();
+                bitmap.BeginInit();
+                bitmap.CacheOption = BitmapCacheOption.OnLoad;
+                bitmap.UriSource = new Uri(openFileDialog.FileName);
+                bitmap.EndInit();
 
-            PreviewImage.Source = bitmap;
-            PreviewImage.Visibility = Visibility.Visible;
+                PreviewImage.Source = bitmap;
+                PreviewImage.Visibility = Visibility.Visible;
+            }
         }
-    }
 
         private void DodajButton_Click(object sender, RoutedEventArgs e)
         {
             string nazwa = NazwaTextBox.Text.Trim();
             string opis = OpisTextBox.Text.Trim();
-            string stanMagazynowy = StanMagazynowyTextBox.Text.Trim();
+            string stanMagazynowyText = StanMagazynowyTextBox.Text.Trim();
 
-            if (string.IsNullOrEmpty(nazwa) || string.IsNullOrEmpty(opis) || string.IsNullOrEmpty(stanMagazynowy))
+            if (string.IsNullOrEmpty(nazwa) || string.IsNullOrEmpty(opis) || string.IsNullOrEmpty(stanMagazynowyText))
             {
                 MessageBox.Show("Wszystkie pola muszą być wypełnione!", "Błąd", MessageBoxButton.OK, MessageBoxImage.Error);
                 return;
@@ -71,25 +59,38 @@ namespace RENT_A_TOOL
                 MessageBox.Show("Należy wybrać zdjęcie!", "Błąd", MessageBoxButton.OK, MessageBoxImage.Error);
                 return;
             }
-
-            using (var context = new Rent_a_toolContext())
+            if (!int.TryParse(stanMagazynowyText, out int stanMagazynowy) || stanMagazynowy < 0)
             {
-                Sprzęt nowySprzet = new Sprzęt
-                {
-                    Nazwa = nazwa,
-                    Opis = opis,
-                    StanMagazynowy = int.Parse(stanMagazynowy),
-                    Zdjecie = _imageData
-                };
-
-                context.Sprzęt.Add(nowySprzet);
-                context.SaveChanges();
+                MessageBox.Show("Stan magazynowy musi być liczbą całkowitą większą lub równą zero!", "Błąd", MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
             }
 
-            MessageBox.Show("Sprzęt został dodany pomyślnie!", "Sukces", MessageBoxButton.OK, MessageBoxImage.Information);
+            try
+            {
+                using (SqlConnection conn = new SqlConnection(_connectionString))
+                {
+                    conn.Open();
+                    string query = "INSERT INTO Sprzęt (Nazwa, Opis, StanMagazynowy, Zdjecie) VALUES (@Nazwa, @Opis, @StanMagazynowy, @Zdjecie)";
 
-            _parentWindow.RefreshSprzetList();
-            this.Close();
-        }
+                    using (SqlCommand cmd = new SqlCommand(query, conn))
+                    {
+                        cmd.Parameters.AddWithValue("@Nazwa", nazwa);
+                        cmd.Parameters.AddWithValue("@Opis", opis);
+                        cmd.Parameters.AddWithValue("@StanMagazynowy", stanMagazynowy);
+                        cmd.Parameters.AddWithValue("@Zdjecie", _imageData);
+
+                        cmd.ExecuteNonQuery();
+                    }
+                }
+
+                MessageBox.Show("Sprzęt został dodany pomyślnie!", "Sukces", MessageBoxButton.OK, MessageBoxImage.Information);
+                _parentWindow.RefreshSprzetList();
+                Close();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Błąd podczas dodawania sprzętu: {ex.Message}", "Błąd", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
         }
     }
+}

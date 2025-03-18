@@ -17,11 +17,12 @@ namespace RENT_A_TOOL
 {
     public partial class RegisterWindow : Window
     {
-        private string connectionString = "Server=DESKTOP-2R2BO2O\\SQLEXPRESS;Database=rent-a-tool;Trusted_Connection=True;TrustServerCertificate=True;";
+        private string _connectionString;
 
-        public RegisterWindow()
+        public RegisterWindow(string connectionString)
         {
             InitializeComponent();
+            _connectionString = connectionString;
         }
 
         private void RegisterButton_Click(object sender, RoutedEventArgs e)
@@ -53,7 +54,7 @@ namespace RENT_A_TOOL
         {
             string query = "INSERT INTO Użytkownicy (imie, nazwisko, email, haslohash) VALUES (@imie, @nazwisko, @email, @haslo)";
 
-            using (SqlConnection conn = new SqlConnection(connectionString))
+            using (SqlConnection conn = new SqlConnection(_connectionString))
             {
                 try
                 {

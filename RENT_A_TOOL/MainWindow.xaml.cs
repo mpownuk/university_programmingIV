@@ -16,21 +16,21 @@ namespace RENT_A_TOOL
     /// </summary>
     public partial class MainWindow : Window
     {
+        public string _connectionString = "Server=DESKTOP-2R2BO2O\\SQLEXPRESS;Database=rent-a-tool;Trusted_Connection=True;TrustServerCertificate=True;";
         public MainWindow()
         {
             InitializeComponent();
         }
-   private void Login_Click(object sender, RoutedEventArgs e)
-{
-    LoginWindow loginWindow = new LoginWindow(this);
-    loginWindow.Show();
-}
+           private void Login_Click(object sender, RoutedEventArgs e)
+        {
+            LoginWindow loginWindow = new LoginWindow(this, _connectionString);
+            loginWindow.Show();
+        }
 
-private void Register_Click(object sender, RoutedEventArgs e)
-{
-    RegisterWindow registerWindow = new RegisterWindow();
-    registerWindow.Show();
-}
-
+        private void Register_Click(object sender, RoutedEventArgs e)
+        {
+            RegisterWindow registerWindow = new RegisterWindow(_connectionString);
+            registerWindow.Show();
+        }
     }
 }

@@ -1,38 +1,30 @@
-﻿using System;
+﻿using Microsoft.Data.SqlClient;
+using System;
 using System.Collections.Generic;
+using System.Data;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
-using RENT_A_TOOL.models;
 
 namespace RENT_A_TOOL
 {
-    /// <summary>
-    /// Logika interakcji dla klasy ToolsWindow.xaml
-    /// </summary>
     public partial class ToolsWindow : Window
     {
         private string _userName;
         private int _userId;
+        private string _connectionString;
 
-        public ToolsWindow(string userName, int userId)
+        public ToolsWindow(string userName, int userId, string connectionString)
         {
             InitializeComponent();
             _userName = userName;
             _userId = userId;
+            _connectionString = connectionString;
             LoadSprzet();
             DisplayUserName();
             CheckAdminPrivileges();
-
         }
 
         private void DisplayUserName()
@@ -53,18 +45,52 @@ namespace RENT_A_TOOL
 
         private void LoadSprzet()
         {
-            using (var context = new Rent_a_toolContext())
-            {
-                var sprzety = context.Sprzęt.ToList();
+            SprzetPanel.Children.Clear();
+            List<Sprzet> sprzety = PobierzSprzetZBazy();
 
-                foreach (var sprzet in sprzety)
-                {
-                    SprzetPanel.Children.Add(CreateSprzetCard(sprzet));
-                }
+            foreach (var sprzet in sprzety)
+            {
+                SprzetPanel.Children.Add(CreateSprzetCard(sprzet));
             }
         }
 
-        private Button CreateSprzetCard(Sprzęt sprzet)
+        private List<Sprzet> PobierzSprzetZBazy()
+        {
+            List<Sprzet> sprzety = new List<Sprzet>();
+            string query = "SELECT Id, Nazwa, Opis, StanMagazynowy, Zdjecie FROM Sprzęt";
+
+            using (SqlConnection conn = new SqlConnection(_connectionString))
+            {
+                try
+                {
+                    conn.Open();
+                    using (SqlCommand cmd = new SqlCommand(query, conn))
+                    {
+                        using (SqlDataReader reader = cmd.ExecuteReader())
+                        {
+                            while (reader.Read())
+                            {
+                                sprzety.Add(new Sprzet
+                                {
+                                    Id = reader.GetInt32(0),
+                                    Nazwa = reader.GetString(1),
+                                    Opis = reader.GetString(2),
+                                    StanMagazynowy = reader.GetInt32(3),
+                                    Zdjecie = reader.IsDBNull(4) ? null : (byte[])reader[4]
+                                });
+                            }
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show("Błąd podczas pobierania sprzętu: " + ex.Message, "Błąd", MessageBoxButton.OK, MessageBoxImage.Error);
+                }
+            }
+            return sprzety;
+        }
+
+        private Button CreateSprzetCard(Sprzet sprzet)
         {
             StackPanel panel = new StackPanel { Margin = new Thickness(10), Width = 200 };
 
@@ -106,7 +132,7 @@ namespace RENT_A_TOOL
             };
             button.Click += (s, e) =>
             {
-                RentToolWindow rentWindow = new RentToolWindow(_userId, sprzet.Id, sprzet.Nazwa, _userName, this);
+                RentToolWindow rentWindow = new RentToolWindow(_userId, sprzet.Id, sprzet.Nazwa, _userName, this, _connectionString);
                 rentWindow.ShowDialog();
             };
 
@@ -115,57 +141,78 @@ namespace RENT_A_TOOL
 
         private ImageSource LoadImage(byte[] imageData)
         {
-            using (var ms = new MemoryStream(imageData))
+            if (imageData == null) return null;
+
+            try
             {
-                BitmapImage image = new BitmapImage();
-                image.BeginInit();
-                image.CacheOption = BitmapCacheOption.OnLoad;
-                image.StreamSource = ms;
-                image.EndInit();
-                return image;
+                using (var ms = new MemoryStream(imageData))
+                {
+                    BitmapImage image = new BitmapImage();
+                    image.BeginInit();
+                    image.CacheOption = BitmapCacheOption.OnLoad;
+                    image.StreamSource = ms;
+                    image.EndInit();
+                    return image;
+                }
+            }
+            catch
+            {
+                return GetPlaceholderImage();
             }
         }
 
         private ImageSource GetPlaceholderImage()
         {
-            BitmapImage placeholder = new BitmapImage(new Uri("pack://application:,,,/Images/placeholder.png"));
-            return placeholder;
+            return new BitmapImage(new Uri("pack://application:,,,/Images/placeholder.png"));
         }
 
         private void CheckAdminPrivileges()
         {
-            if (_userName.ToUpper() == "ADMIN")
+            if (_userName.Equals("ADMIN", StringComparison.OrdinalIgnoreCase))
             {
-                Button addButton = new Button
-                {
-                    Content = "Dodaj sprzęt",
-                    FontSize = 14,
-                    Width = 150,
-                    Padding = new Thickness(10),
-                    Margin = new Thickness(10),
-                    HorizontalAlignment = HorizontalAlignment.Center,
-                    VerticalAlignment = VerticalAlignment.Bottom,
-                    Background = Brushes.Green,
-                    Foreground = Brushes.White
-                };
-
-                addButton.Click += AddButton_Click;
-                MainGrid.Children.Add(addButton);
-                Grid.SetRow(addButton, 2);
-                Grid.SetColumnSpan(addButton, 2);
+                MainGrid.Children.Add(UtworzAdminButton());
             }
+        }
+
+        private Button UtworzAdminButton()
+        {
+            Button addButton = new Button
+            {
+                Content = "Dodaj sprzęt",
+                FontSize = 14,
+                Width = 150,
+                Padding = new Thickness(10),
+                Margin = new Thickness(10),
+                HorizontalAlignment = HorizontalAlignment.Center,
+                VerticalAlignment = VerticalAlignment.Bottom,
+                Background = Brushes.Green,
+                Foreground = Brushes.White
+            };
+            addButton.Click += AddButton_Click;
+            Grid.SetRow(addButton, 2);
+            Grid.SetColumnSpan(addButton, 2);
+
+            return addButton;
         }
 
         private void AddButton_Click(object sender, RoutedEventArgs e)
         {
-            AddToolWindow addToolWindow = new AddToolWindow(this);
+            AddToolWindow addToolWindow = new AddToolWindow(this, _connectionString);
             addToolWindow.ShowDialog();
         }
 
         public void RefreshSprzetList()
         {
-            SprzetPanel.Children.Clear();
             LoadSprzet();
         }
+    }
+
+    public class Sprzet
+    {
+        public int Id { get; set; }
+        public string Nazwa { get; set; }
+        public string Opis { get; set; }
+        public int StanMagazynowy { get; set; }
+        public byte[] Zdjecie { get; set; }
     }
 }

@@ -1,10 +1,10 @@
-﻿using System;
+﻿using Microsoft.Data.SqlClient;
+using System;
+using System.Data;
 using System.IO;
-using System.Linq;
 using System.Windows;
 using System.Windows.Media.Imaging;
 using Microsoft.Win32;
-using RENT_A_TOOL.models;
 
 namespace RENT_A_TOOL
 {
@@ -13,13 +13,14 @@ namespace RENT_A_TOOL
         private byte[]? _imageData;
         private int _toolId;
         private ToolsWindow _parentWindow;
-        private Sprzęt _aktualizowanySprzet;
+        private string _connectionString;
 
-        public UpdateToolWindow(int toolId, ToolsWindow parentWindow)
+        public UpdateToolWindow(int toolId, ToolsWindow parentWindow, string connectionString)
         {
             InitializeComponent();
             _toolId = toolId;
             _parentWindow = parentWindow;
+            _connectionString = connectionString;
             WczytajDaneSprzetu();
         }
 
@@ -47,33 +48,51 @@ namespace RENT_A_TOOL
 
         private void WczytajDaneSprzetu()
         {
-            using (var context = new Rent_a_toolContext())
+            string query = "SELECT Nazwa, Opis, StanMagazynowy, Zdjecie FROM Sprzęt WHERE Id = @ToolId";
+
+            using (SqlConnection conn = new SqlConnection(_connectionString))
             {
-                _aktualizowanySprzet = context.Sprzęt.FirstOrDefault(t => t.Id == _toolId);
-                if (_aktualizowanySprzet == null)
+                try
                 {
-                    MessageBox.Show("Nie znaleziono sprzętu.", "Błąd", MessageBoxButton.OK, MessageBoxImage.Error);
-                    this.Close();
-                    return;
-                }
-
-                NazwaTextBox.Text = _aktualizowanySprzet.Nazwa;
-                OpisTextBox.Text = _aktualizowanySprzet.Opis;
-                StanMagazynowyTextBox.Text = _aktualizowanySprzet.StanMagazynowy.ToString();
-
-                if (_aktualizowanySprzet.Zdjecie != null)
-                {
-                    _imageData = _aktualizowanySprzet.Zdjecie;
-                    BitmapImage bitmap = new BitmapImage();
-                    using (MemoryStream ms = new MemoryStream(_imageData))
+                    conn.Open();
+                    using (SqlCommand cmd = new SqlCommand(query, conn))
                     {
-                        bitmap.BeginInit();
-                        bitmap.CacheOption = BitmapCacheOption.OnLoad;
-                        bitmap.StreamSource = ms;
-                        bitmap.EndInit();
+                        cmd.Parameters.AddWithValue("@ToolId", _toolId);
+
+                        using (SqlDataReader reader = cmd.ExecuteReader())
+                        {
+                            if (reader.Read())
+                            {
+                                NazwaTextBox.Text = reader.GetString(0);
+                                OpisTextBox.Text = reader.GetString(1);
+                                StanMagazynowyTextBox.Text = reader.GetInt32(2).ToString();
+
+                                if (!reader.IsDBNull(3))
+                                {
+                                    _imageData = (byte[])reader[3];
+                                    BitmapImage bitmap = new BitmapImage();
+                                    using (MemoryStream ms = new MemoryStream(_imageData))
+                                    {
+                                        bitmap.BeginInit();
+                                        bitmap.CacheOption = BitmapCacheOption.OnLoad;
+                                        bitmap.StreamSource = ms;
+                                        bitmap.EndInit();
+                                    }
+                                    PreviewImage.Source = bitmap;
+                                    PreviewImage.Visibility = Visibility.Visible;
+                                }
+                            }
+                            else
+                            {
+                                MessageBox.Show("Nie znaleziono sprzętu.", "Błąd", MessageBoxButton.OK, MessageBoxImage.Error);
+                                this.Close();
+                            }
+                        }
                     }
-                    PreviewImage.Source = bitmap;
-                    PreviewImage.Visibility = Visibility.Visible;
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show("Błąd podczas pobierania danych sprzętu: " + ex.Message, "Błąd", MessageBoxButton.OK, MessageBoxImage.Error);
                 }
             }
         }
@@ -82,37 +101,59 @@ namespace RENT_A_TOOL
         {
             string nazwa = NazwaTextBox.Text.Trim();
             string opis = OpisTextBox.Text.Trim();
-            string stanMagazynowy = StanMagazynowyTextBox.Text.Trim();
+            string stanMagazynowyText = StanMagazynowyTextBox.Text.Trim();
 
-            if (string.IsNullOrEmpty(nazwa) || string.IsNullOrEmpty(opis) || string.IsNullOrEmpty(stanMagazynowy))
+            if (string.IsNullOrEmpty(nazwa) || string.IsNullOrEmpty(opis) || string.IsNullOrEmpty(stanMagazynowyText))
             {
                 MessageBox.Show("Wszystkie pola muszą być wypełnione!", "Błąd", MessageBoxButton.OK, MessageBoxImage.Error);
                 return;
             }
 
-            using (var context = new Rent_a_toolContext())
+            if (!int.TryParse(stanMagazynowyText, out int stanMagazynowy))
             {
-                var sprzet = context.Sprzęt.FirstOrDefault(t => t.Id == _toolId);
-                if (sprzet == null)
-                {
-                    MessageBox.Show("Nie znaleziono sprzętu do aktualizacji.", "Błąd", MessageBoxButton.OK, MessageBoxImage.Error);
-                    return;
-                }
-
-                sprzet.Nazwa = nazwa;
-                sprzet.Opis = opis;
-                sprzet.StanMagazynowy = int.Parse(stanMagazynowy);
-                if (_imageData != null)
-                {
-                    sprzet.Zdjecie = _imageData;
-                }
-
-                context.SaveChanges();
+                MessageBox.Show("Stan magazynowy musi być liczbą!", "Błąd", MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
             }
 
-            MessageBox.Show("Sprzęt został zaktualizowany pomyślnie!", "Sukces", MessageBoxButton.OK, MessageBoxImage.Information);
-            _parentWindow.RefreshSprzetList();
-            this.Close();
+            string query = _imageData != null
+                ? "UPDATE Sprzęt SET Nazwa = @Nazwa, Opis = @Opis, StanMagazynowy = @StanMagazynowy, Zdjecie = @Zdjecie WHERE Id = @ToolId"
+                : "UPDATE Sprzęt SET Nazwa = @Nazwa, Opis = @Opis, StanMagazynowy = @StanMagazynowy WHERE Id = @ToolId";
+
+            using (SqlConnection conn = new SqlConnection(_connectionString))
+            {
+                try
+                {
+                    conn.Open();
+                    using (SqlCommand cmd = new SqlCommand(query, conn))
+                    {
+                        cmd.Parameters.AddWithValue("@Nazwa", nazwa);
+                        cmd.Parameters.AddWithValue("@Opis", opis);
+                        cmd.Parameters.AddWithValue("@StanMagazynowy", stanMagazynowy);
+                        cmd.Parameters.AddWithValue("@ToolId", _toolId);
+
+                        if (_imageData != null)
+                        {
+                            cmd.Parameters.Add("@Zdjecie", SqlDbType.VarBinary).Value = _imageData;
+                        }
+
+                        int rowsAffected = cmd.ExecuteNonQuery();
+                        if (rowsAffected > 0)
+                        {
+                            MessageBox.Show("Sprzęt został zaktualizowany pomyślnie!", "Sukces", MessageBoxButton.OK, MessageBoxImage.Information);
+                            _parentWindow.RefreshSprzetList();
+                            this.Close();
+                        }
+                        else
+                        {
+                            MessageBox.Show("Nie znaleziono sprzętu do aktualizacji.", "Błąd", MessageBoxButton.OK, MessageBoxImage.Error);
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show("Błąd podczas aktualizacji sprzętu: " + ex.Message, "Błąd", MessageBoxButton.OK, MessageBoxImage.Error);
+                }
+            }
         }
     }
 }
